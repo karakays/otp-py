@@ -1,10 +1,15 @@
-import hashlib, hmac, time, base64, functools
+import time
+import hmac
+import base64
+import hashlib
+import functools
 from enum import Enum
+
 
 def create_otp(secret, counter):
     token = Token('I2TE4DXFFG4QQKBS', 30, 'SHA1', 6)
     return token.generateCode()
- 
+
 
 class TokenCode:
     def __init__(self, code, start, end):
@@ -30,8 +35,8 @@ class TokenCode:
     def remaining(self):
         current = time.time()
         rem = self.end - current
-        return 0 if rem <=0 else int(rem)
-        
+        return 0 if rem <= 0 else int(rem)
+
 
 class TokenType(Enum):
         HOTP, TOTP = range(2)
@@ -56,7 +61,6 @@ class Token:
     def toUri(self):
         pass
 
-
     def generateCode(self):
         start = time.time()
         counter = int(start / self.period)
@@ -73,8 +77,8 @@ class Token:
         while len(code) < self.digits:
             code = '0' + code
 
-        return TokenCode(code, (counter + 0) * self.period, (counter + 1) * self.period)
-
+        return TokenCode(code, (counter + 0) * self.period,
+                         (counter + 1) * self.period)
 
     @classmethod
     def fromUri(cls, uri):
@@ -96,7 +100,7 @@ class Token:
             period = 30 if not period else int(period[0])
         except ValueError:
             raise InvalidTokenUriError()
-        
+
         digits = params.get('digits')
         try:
             digits = 6 if not digits else int(digits[0])
@@ -108,7 +112,6 @@ class Token:
 
         return Token(secret, period, algorithm, digits)
 
-
     @classmethod
     def fromString(cls, string):
         from urllib.parse import urlparse
@@ -117,4 +120,3 @@ class Token:
 
 class InvalidTokenUriError(Exception):
     pass
-

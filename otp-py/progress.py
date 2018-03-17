@@ -1,5 +1,5 @@
-import time, sys
-
+import time
+import sys
 from datetime import timedelta
 
 
@@ -20,7 +20,7 @@ class Progress(object):
 
     @property
     def elapsed_td(self):
-        return timedelta(seconds = self.elapsed)
+        return timedelta(seconds=self.elapsed)
 
     @property
     def progress(self):
@@ -37,7 +37,7 @@ class Progress(object):
     def finish(self):
         pass
 
-    def next(self, i = 1):
+    def next(self, i=1):
         now = time.time()
         dt = now - self.step_start
         self.step_start = now
@@ -75,7 +75,7 @@ class Bar(object):
         p = int(progress.progress * self.width)
         r = self.width - p
 
-        out = ('\r{}[{}{}]'.format(self.message, p * self.fill , r * self.empty))
+        out = ('\r{}[{}{}]'.format(self.message, p * self.fill,
+                                   r * self.empty))
         sys.stdout.write(out)
         sys.stdout.flush()
-
