@@ -38,11 +38,11 @@ def main():
         if cmd == 'get':
             config = configure.read()
             uri = urlparse(unquote(config))
-            token = core.get_otp_by_uri(uri)
-            print(token)
-            # iterate progress
-            for i in core.progress(token):
-                pass
+            while True:
+                token = core.get_otp_by_uri(uri)
+                # iterate progress
+                for i in core.progress(token):
+                    pass
         elif cmd == 'qrcode':
             config = configure.read()
             uri = urlparse(unquote(config))
