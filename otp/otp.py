@@ -20,26 +20,32 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# import logging
+
+import logging
 from urllib.parse import urlparse, unquote
 from otp import cli
 from otp import core
 from otp import configure
 from otp.token import InvalidTokenUriError
 
-# logger = logging.getLogger(__name__)
+
+logger = logging.getLogger(__name__)
 
 
-def main():
+def run():
     try:
         args = {k: v for k, v in vars(cli.parse_args()).items() if v}
-        cmd = args.pop('command')
 
+        logging.basicConfig(level=args.pop('loglevel'))
+
+        cmd = args.pop('command')
+        logger.debug('Calling command %s', cmd)
         if cmd == 'get':
             config = configure.read()
             uri = urlparse(unquote(config))
             while True:
                 token = core.get_otp_by_uri(uri)
+                logger.debug('Built token %s', token)
                 # iterate progress
                 for i in core.progress(token):
                     pass
@@ -47,19 +53,19 @@ def main():
             config = configure.read()
             uri = urlparse(unquote(config))
             token = core.get_otp_by_uri(uri)
-            print(core.create_qrcode(token))
+            logger.debug('Built token %s', token)
+            logger.info(core.create_qrcode(token))
         elif cmd == 'config':
             configure.configure()
         else:
             assert cmd, 'Unknown command {}'.format(cmd)
-    except InvalidTokenUriError as e:
-        print(e)
-        pass
+    except InvalidTokenUriError:
+        logger.error('Invalid token', exc_info=1)
     except KeyboardInterrupt:
         pass
-    except Exception as e:
-        print('Caught it', e)
+    except Exception:
+        logger.error('Something\'s wrong here', exc_info=1)
 
 
 if __name__ == '__main__':
-    main()
+    run()
