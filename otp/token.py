@@ -19,12 +19,17 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+
+import logging
 import time
 import hmac
 import hashlib
 import functools
 import base64
 from enum import Enum
+
+
+logger = logging.getLogger(__name__)
 
 
 class TokenCode:
@@ -97,10 +102,11 @@ class Token:
     def generateCode(self):
         start = time.time()
         counter = int(start / self.period)
-
+        logger.debug('Getting mac of counter %s', counter)
         mac = hmac.new(self.secret, counter.to_bytes(8, 'big'), hashlib.sha1)
         digest = mac.digest()
         offset = digest[len(digest) - 1] & 0x0f
+        logger.debug('Found offset of %s', offset)
         buf = [digest[i + offset] << (8 * (3 - i)) for i in range(4)]
         res = functools.reduce((lambda x, y: x | y), buf)
         code = res % (10 ** self.digits)
@@ -179,8 +185,10 @@ class Token:
         return Token.fromUri(urlparse(unquote(string)))
 
     def __str__(self):
-        return 'Token[issuer={}, user={}, secret={}, digits={}, algorithm={}, period={}]'.format(self.issuer, self.user, self.secret,
-                self.digits, self.algorithm, self.period)
+        return 'Token[issuer={}, user={}, secret={}, digits={},\\\
+                algorithm={}, period={}]'.format(self.issuer, self.user,
+                                                 self.secret, self.digits,
+                                                 self.algorithm, self.period)
 
 
 class InvalidTokenUriError(Exception):
