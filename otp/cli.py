@@ -1,14 +1,16 @@
 import argparse
+import logging
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
 
-#    parser.add_argument('-v', '--verbose', help='verbose output',
-#                        action='store_const', dest='loglevel',
-#                        const=logging.DEBUG, default=logging.INFO)
+    parser.add_argument('-v', '--verbose', help='verbose output',
+                        action='store_const', dest='loglevel',
+                        const=logging.DEBUG, default=logging.INFO)
 
     subparsers = parser.add_subparsers(dest='command')
+    subparsers.required = True
 
     subparsers.add_parser('get')
 
