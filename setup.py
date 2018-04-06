@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='otp',
-    version='0.1',
+    version='0.1.0.dev1',
     author='Selçuk Karakayalı',
     author_email='skarakayali@gmail.com',
     maintainer='Selçuk Karakayalı',
