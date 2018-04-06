@@ -22,8 +22,7 @@ The way to install otp-gen is to use `pip`_
 Getting Started
 ---------------
 
-You need to provision secret key, issuer, user, period, digits, secure hash algorithm with *config* command. Default values are shown inside
-parantheses. 
+You need to provision secret key, issuer, user associated with token by using *config* command. Default values are shown if any. 
 
 .. code:: bash
 
@@ -39,7 +38,7 @@ parantheses.
 Usage
 ---------------
 
-You can request a new OTP by using *get* command. A progress bar showing expiry period of the current valid code is provided along. get command continuously updates new codes.
+You can request a new OTP by using *get* command. A progress bar appears next to the code to indicate expiry period of it. *get* continuously provides valid codes until killed.
 
 
 .. code:: bash
