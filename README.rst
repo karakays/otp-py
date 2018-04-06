@@ -12,7 +12,7 @@ Requirements
 ------------
 Installation
 ------------
-The way to install aws-cli is to use `pip`_
+The way to install otp-gen is to use `pip`_
 
 .. code:: bash
 
