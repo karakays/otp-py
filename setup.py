@@ -10,6 +10,7 @@ setup(
     maintainer='Selçuk Karakayalı',
     url='http://github.com/karakays/otp-py/',
     packages=find_packages(),
+    python_requires='>=3',
     license='MIT',
     keywords=['otp', 'otp-codes', 'otp-generator', 'authenticator'],
     description='Generate one time passwords',
