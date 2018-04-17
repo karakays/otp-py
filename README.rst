@@ -1,3 +1,6 @@
+.. image:: https://badge.fury.io/py/otp-gen.svg
+    :target: https://badge.fury.io/py/otp-gen
+
 =======
 otp-gen
 =======
