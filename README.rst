@@ -16,7 +16,7 @@ The way to install otp-gen is to use `pip`_
 
 .. code:: bash
 
-    $ pip install otp-gen
+    $ pip3 install otp-gen
 
 ---------------
 Getting Started
