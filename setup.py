@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='otp-gen',
-    version='0.1.1',
+    version='0.1.2',
     author='Selçuk Karakayalı',
     author_email='skarakayali@gmail.com',
     maintainer='Selçuk Karakayalı',
