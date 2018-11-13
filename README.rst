@@ -28,6 +28,7 @@ Getting Started
 You need to provision secret key, issuer, user associated with token by using *config* command. Default values are shown if any. 
 
 .. image:: img/demo-provisioning.gif
+    :align: center
 
 ---------------
 Usage
@@ -38,7 +39,7 @@ You can request a new OTP by using *get* command. A progress bar appears next to
 Current configuration can be embedded in a QR code by using *qrcode* command.
 
 .. image:: img/demo.gif
-
+    :align: center
 ---------------
 References
 ---------------
