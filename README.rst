@@ -27,15 +27,7 @@ Getting Started
 
 You need to provision secret key, issuer, user associated with token by using *config* command. Default values are shown if any. 
 
-.. code:: bash
-
-    $ otp config
-    Secret key: JBSWY3DPEHPK3PXP
-    Issuer: Foo
-    User: Bar
-    Period (30 seconds):
-    Digits (6):
-    Algorithm (SHA-256):
+.. image:: img/demo-provisioning.gif
 
 ---------------
 Usage
@@ -43,18 +35,9 @@ Usage
 
 You can request a new OTP by using *get* command. A progress bar appears next to the code to indicate expiry period of it. *get* continuously provides valid codes until killed.
 
-
-.. code:: bash
-
-    $ otp get
-    Code = 004790, progress [*****************-----------------------]
-
 Current configuration can be embedded in a QR code by using *qrcode* command.
 
-
-.. code:: bash
-
-    $ otp qrcode
+.. image:: img/demo.gif
 
 ---------------
 References
