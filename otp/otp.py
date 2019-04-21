@@ -53,7 +53,7 @@ def run():
             uri = urlparse(unquote(config))
             token = core.get_otp_by_uri(uri)
             logger.debug('Built token %s', token)
-            logger.info(core.create_qrcode(token))
+            logger.debug(core.create_qrcode(token))
         elif cmd == 'config':
             configure.configure()
         else:
