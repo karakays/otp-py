@@ -105,11 +105,17 @@ class Token:
         logger.debug('Getting mac of counter %s', counter)
         mac = hmac.new(self.secret, counter.to_bytes(8, 'big'), hashlib.sha1)
         digest = mac.digest()
+        logger.debug("digest=%s", " ".join([f"{b:02X}" for b in digest]))
         offset = digest[len(digest) - 1] & 0x0f
         logger.debug('Found offset of %s', offset)
-        buf = [digest[i + offset] << (8 * (3 - i)) for i in range(4)]
-        res = functools.reduce((lambda x, y: x | y), buf)
-        code = res % (10 ** self.digits)
+
+        # why is msb set to 0?
+        msb = digest[offset] & 0x7F
+        for i in range(1, 4):
+            msb <<= 8
+            msb |= digest[offset + i] & 0xFF
+
+        code = msb % (10 ** self.digits)
         code = str(code)
 
         while len(code) < self.digits:
