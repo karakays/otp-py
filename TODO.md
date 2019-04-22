@@ -1,5 +1,6 @@
 ## BUGS
 * code is wrong in some cases (might be related with MSB issue)
+* same code is generated in the next iteration (although time period has elapsed)
 * in case of missing configuration, stacktrace is dumped
 
 
