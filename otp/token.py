@@ -102,12 +102,12 @@ class Token:
     def generateCode(self):
         start = time.time()
         counter = int(start / self.period)
-        logger.debug('Getting mac of counter %s', counter)
+        logger.debug('counter=%s', counter)
         mac = hmac.new(self.secret, counter.to_bytes(8, 'big'), hashlib.sha1)
         digest = mac.digest()
-        logger.debug("digest=%s", " ".join([f"{b:02X}" for b in digest]))
+        logger.debug("%s:digest=%s", counter, " ".join([f"{b:02X}" for b in digest]))
         offset = digest[len(digest) - 1] & 0x0f
-        logger.debug('Found offset of %s', offset)
+        logger.debug('%s:offset=%s', counter, offset)
 
         # why is msb set to 0?
         msb = digest[offset] & 0x7F
