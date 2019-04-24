@@ -117,15 +117,18 @@ def create_qrcode(token):
     return qr_code.create_qr_code(uri)
 
 
-def progress(token, refresh=1):
+def progress(token):
     token_code = token.generateCode()
     current = token_code.progress
     progress = Progress(index=(current * token.period), mxm=token.period)
-    message = 'Code = {}, progress '.format(token_code.code)
+    message = f'Code = {token_code.code}, progress '
     bar = Bar(message)
     progress.attach(bar)
 
-    rng = range(int((1 - current) * token.period))
-    for i in progress.iter(rng):
+    # iterate the remaining range
+    # progress bar to render completely until
+    # the end of token expiry
+    rem_rng = range(token_code.remaining)
+    for i in progress.iter(rem_rng):
         yield i
-        time.sleep(refresh)
+        time.sleep(1)

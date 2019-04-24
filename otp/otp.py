@@ -44,8 +44,7 @@ def run():
             uri = urlparse(unquote(config))
             while True:
                 token = core.get_otp_by_uri(uri)
-                logger.debug('Built token %s', token)
-                # iterate progress
+                logger.debug('Built a new token %s', token)
                 for i in core.progress(token):
                     pass
         elif cmd == 'qrcode':
