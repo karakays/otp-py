@@ -126,8 +126,7 @@ def progress(token):
     progress.attach(bar)
 
     # iterate the remaining range
-    # progress bar to render completely until
-    # the end of token expiry
+    # let progress bar render until token expires completely
     rem_rng = range(token_code.remaining)
     for i in progress.iter(rem_rng):
         yield i
