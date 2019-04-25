@@ -46,6 +46,10 @@ class TokenCode:
 
     @property
     def progress(self):
+        """
+        Returns what progress was made until the expiry of the token
+        , between 0 and 1
+        """
         current = time.time()
 
         if current >= self.end:
@@ -57,7 +61,7 @@ class TokenCode:
     @property
     def remaining(self):
         """
-        Returns the duration in seconds that token is still valid
+        Returns the duration in seconds in that token is still valid
         """
         return math.ceil((1 - self.progress) * self.period)
 
