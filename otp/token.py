@@ -26,6 +26,7 @@ import hmac
 import hashlib
 import functools
 import base64
+import math
 from enum import Enum
 
 
@@ -33,10 +34,11 @@ logger = logging.getLogger(__name__)
 
 
 class TokenCode:
-    def __init__(self, code, start, end):
+    def __init__(self, code, start, end, period):
         self.start = start
         self.end = end
         self.code = code
+        self.period = period
 
     @property
     def block(self):
@@ -47,16 +49,17 @@ class TokenCode:
         current = time.time()
 
         if current >= self.end:
-            return 0
+            return 1
 
         p = (current - self.start)
         return (p / self.block)
 
     @property
     def remaining(self):
-        current = time.time()
-        rem = self.end - current
-        return 0 if rem <= 0 else int(rem)
+        """
+        Returns the duration in seconds that token is still valid
+        """
+        return math.ceil((1 - self.progress) * self.period)
 
 
 class TokenType(Enum):
@@ -121,8 +124,8 @@ class Token:
         while len(code) < self.digits:
             code = '0' + code
 
-        return TokenCode(code, (counter + 0) * self.period,
-                         (counter + 1) * self.period)
+        return TokenCode(code, (counter) * self.period,
+                        (counter + 1) * self.period, self.period)
 
     @classmethod
     def fromUri(cls, uri):
@@ -191,11 +194,7 @@ class Token:
         return Token.fromUri(urlparse(unquote(string)))
 
     def __str__(self):
-        return 'Token[issuer={}, user={}, secret={}, digits={},\\\
-                algorithm={}, period={}]'.format(self.issuer, self.user,
-                                                 self.secret, self.digits,
-                                                 self.algorithm, self.period)
-
+        return f'Token[issuer={self.issuer}, user={self.user}]'
 
 class InvalidTokenUriError(Exception):
     def __init__(self, msg=None, value=None):
