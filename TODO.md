@@ -1,8 +1,7 @@
 ## BUGS
 * code is wrong in some cases (might be related with MSB issue)
-* the same code is generated in the next iteration (although time period has elapsed)
-* progress bar doesn't complete wholely sometimes if near to end is reached
 * in case of missing configuration, stacktrace is dumped
+* sha-256 specified in config but sha-1 is in code
 
 
 ## IMPROVE
