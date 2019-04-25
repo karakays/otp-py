@@ -34,15 +34,11 @@ logger = logging.getLogger(__name__)
 
 
 class TokenCode:
-    def __init__(self, code, start, end, period):
+    def __init__(self, code, start, end):
         self.start = start
         self.end = end
         self.code = code
-        self.period = period
-
-    @property
-    def block(self):
-        return self.end - self.start
+        self.window = end - start
 
     @property
     def progress(self):
@@ -56,14 +52,14 @@ class TokenCode:
             return 1
 
         p = (current - self.start)
-        return (p / self.block)
+        return (p / self.window)
 
     @property
     def remaining(self):
         """
         Returns the duration in seconds in that token is still valid
         """
-        return math.ceil((1 - self.progress) * self.period)
+        return math.ceil((1 - self.progress) * self.window)
 
 
 class TokenType(Enum):
