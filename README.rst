@@ -25,7 +25,7 @@ The way to install otp-gen is to use `pip`_
 Getting Started
 ---------------
 
-You need to provision secret key, issuer, user associated with token by using *config* command. Default values are shown if any. 
+You need to provision the secret key, issuer and rest of the details with the ``config`` command. Default values are shown if any.
 
 .. image:: img/demo-provisioning.gif
     :align: center
@@ -34,9 +34,9 @@ You need to provision secret key, issuer, user associated with token by using *c
 Usage
 ---------------
 
-You can request a new OTP by using *get* command. A progress bar appears next to the code to indicate expiry period of it. *get* continuously provides valid codes until killed.
+You can request a new OTP with the ``get`` command. A progress bar appears next to the code to indicate expiry period of it. ``get`` continuously provides valid codes until killed.
 
-Current configuration can be embedded in a QR code by using *qrcode* command.
+Current configuration can be embedded in a QR code by using ``qrcode`` command.
 
 .. image:: img/demo.gif
     :align: center
