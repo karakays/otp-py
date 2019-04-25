@@ -109,23 +109,20 @@ class Token:
         mac = hmac.new(self.secret, counter.to_bytes(8, 'big'), hashlib.sha1)
         digest = mac.digest()
         logger.debug("%s:digest=%s", counter, " ".join([f"{b:02X}" for b in digest]))
-        offset = digest[len(digest) - 1] & 0x0f
+        offset = digest[len(digest) - 1] & 0x0F
         logger.debug('%s:offset=%s', counter, offset)
 
-        # why is msb set to 0?
+        # mask MSB
         msb = digest[offset] & 0x7F
         for i in range(1, 4):
             msb <<= 8
             msb |= digest[offset + i] & 0xFF
 
         code = msb % (10 ** self.digits)
-        code = str(code)
-
-        while len(code) < self.digits:
-            code = '0' + code
+        code = f"{code:06d}"
 
         return TokenCode(code, (counter) * self.period,
-                        (counter + 1) * self.period, self.period)
+                        (counter + 1) * self.period)
 
     @classmethod
     def fromUri(cls, uri):
