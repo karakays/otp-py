@@ -30,5 +30,5 @@ release:
 	$(PYTHON) setup.py check sdist
 	git push origin master --tags
 
-deploy:
-	#twine upload dist/*
+publish:
+	twine upload dist/*
