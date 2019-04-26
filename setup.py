@@ -8,7 +8,7 @@ with open("otp/_version.py") as fp:
     exec(fp.read(), pkg_vars)
 
 setup(
-    name='otp-gen',
+    name='otp-py',
     version=pkg_vars['__version__'],
     author='Selçuk Karakayalı',
     author_email='skarakayali@gmail.com',
