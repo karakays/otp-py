@@ -23,6 +23,7 @@
 import time
 import base64
 import binascii
+import cv2 as cv
 from urllib.parse import parse_qs, urlunsplit, urlencode
 from otp import qr_code
 from otp.token import Token, TokenType, InvalidTokenUriError
@@ -53,6 +54,13 @@ def get_otp_by_uri(uri):
         kwargs[k] = v[0]
 
     return get_otp_by_secret(secret, **kwargs)
+
+
+def get_otp_by_qrcode(file):
+    im = cv.imread(file)
+    det = cv.QRCodeDetector()
+    retval, points, straight_qrcode = det.detectAndDecode(im)
+    return get_otp_by_uri(retval)
 
 
 def get_otp_by_secret(secret, **kwargs):
