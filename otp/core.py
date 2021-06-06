@@ -19,15 +19,16 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
-import time
+import asyncio
 import base64
 import binascii
-import cv2 as cv
 from urllib.parse import parse_qs, urlunsplit, urlencode
+
+import cv2 as cv
+
 from otp import qr_code
+from otp.progress import Progress, Bar, Timer
 from otp.token import Token, TokenType, InvalidTokenUriError
-from otp.progress import Progress, Bar
 
 
 def get_otp_by_uri(uri):
@@ -100,7 +101,8 @@ def get_otp_by_secret(secret, **kwargs):
         raise InvalidTokenUriError('Invalid encryption algorithm',
                                    algorithm) from e
 
-    return Token(token_type, issuer, user, secret, period, algorithm, digits)
+    return Token(t_type=token_type, issuer=issuer, user=user, secret=secret, period=period,
+                 algorithm=algorithm, digits=digits)
 
 
 def create_uri(token):
@@ -125,17 +127,28 @@ def create_qrcode(token):
     return qr_code.create_qr_code(uri)
 
 
-def progress(token):
-    token_code = token.generateCode()
-    current = token_code.progress
-    progress = Progress(index=(current * token.period), mxm=token.period)
-    message = f'Code = {token_code.code}, progress '
-    bar = Bar(message)
-    progress.attach(bar)
+async def progress(token):
+    bar = Timer()
 
-    # iterate the remaining range
-    # let progress bar render until token expires completely
-    rem_rng = range(token_code.remaining)
-    for i in progress.iter(rem_rng):
-        yield i
-        time.sleep(1)
+    while True:
+        token_code = token.generateCode()
+        current = token_code.progress
+
+        progress = Progress(index=(current * token.period), mxm=token.period)
+        message = f'{token.issuer}, code = {token_code.code}'
+        bar.message = message
+
+        progress.attach(bar)
+
+        # iterate the remaining range
+        # let progress bar render until token expires completely
+        rem_rng = range(token_code.remaining)
+
+        for i in progress.iter(rem_rng):
+            await asyncio.sleep(1)
+
+
+class Account:
+    def __init__(self, issuer, user):
+        self.issuer = issuer
+        self.user = user

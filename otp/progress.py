@@ -24,6 +24,8 @@ import time
 import sys
 from datetime import timedelta
 
+vertical_tab_counter = 0
+
 
 class Progress(object):
     def __init__(self, *args, **kwargs):
@@ -72,7 +74,7 @@ class Progress(object):
                 yield i
                 self.next()
         finally:
-                self.finish()
+            self.finish()
 
     def attach(self, observer):
         self.observers.append(observer)
@@ -89,15 +91,42 @@ class Bar(object):
     fill = '*'
     empty = '-'
     width = 40
+    vertical_tab = '\v'
+    line_feed = '\n'
 
     def __init__(self, message=''):
         self.message = message
+        global vertical_tab_counter
+        self.vertical_index = vertical_tab_counter
+        vertical_tab_counter += 1
 
+    # https://github.com/Yoskutik/awesome_progress_bar
+    # https://tldp.org/HOWTO/Bash-Prompt-HOWTO/x361.html
     def update(self, progress):
         p = int(progress.progress * self.width)
         r = self.width - p
 
-        out = ('\r{}[{}{}]'.format(self.message, p * self.fill,
-                                   r * self.empty))
+        #sys.stdout.write("\x1b[6n")
+        #pos = sys.stdin.read(10)
+        #print(pos)
+
+        out = f"\r{self.message} [{p * self.fill}{r * self.empty}]\n"
+        sys.stdout.write(out)
+        sys.stdout.flush()
+
+
+class Timer(object):
+    def __init__(self, message=''):
+        self.message = message
+
+    def update(self, progress):
+        if progress.percent > 80:
+            level = "\033[31m"
+        elif progress.percent > 60:
+            level = "\033[33m"
+        else:
+            level = "\033[32m"
+
+        out = f"\r{self.message} {level} {int(progress.remaining)} seconds\033[0m\n"
         sys.stdout.write(out)
         sys.stdout.flush()

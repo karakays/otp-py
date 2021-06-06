@@ -19,40 +19,69 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
+import base64
+import io
 import logging
-from urllib.parse import urlparse, unquote
-from otp import cli
-from otp import core
-from otp import configure
-from otp.token import InvalidTokenUriError
+import os
+import asyncio
 
+from urllib.parse import urlparse, unquote, parse_qs
+
+import pyperclip
+
+from otp import cli
+from otp import configure
+from otp import core
+
+from otp.token import Token, TokenType, InvalidTokenUriError
 
 logger = logging.getLogger(__name__)
 
+CONFIG_PATH = os.environ["HOME"] + '/.otp/'+ '.otprc'
 
-def run():
+
+async def run():
     try:
-        args = {k: v for k, v in vars(cli.parse_args()).items() if v}
+        args = cli.parse_args()
+        args_dict = {k: v for k, v in vars(args).items() if v}
 
-        logging.basicConfig(level=args.pop('loglevel'))
+        logging.basicConfig(level=args_dict.pop('loglevel'))
 
-        cmd = args.pop('command')
-        logger.debug('Calling command %s', cmd)
-        if cmd == 'get':
-            config = configure.read()
-            uri = urlparse(unquote(config))
-            while True:
-                token = core.get_otp_by_uri(uri)
-                logger.debug('Built a new token %s', token)
-                for i in core.progress(token):
-                    pass
-        elif cmd == 'qrcode':
-            config = configure.read()
-            uri = urlparse(unquote(config))
-            token = core.get_otp_by_uri(uri)
-            logger.debug('Built token %s', token)
-            logger.debug(core.create_qrcode(token))
+        cmd = args_dict.get('command')
+
+        logger.debug('Command=%s is being called %s', cmd)
+        if cmd == None:
+            #config = configure.read()
+            #uri = urlparse(unquote(config))
+            #token = core.get_otp_by_uri(uri)
+
+            tokens = list_otp()
+
+            # logger.debug('Built a new token %s', token)
+            if args.progress:
+                # while True:
+                    #for token in tokens:
+                        #await core.progress(token)
+                    # core.progress_wrapper(token)
+                print("✨ Generating codes...")
+                await asyncio.gather(*(core.progress(token) for token in tokens))
+
+            account = None
+            if args.account:
+                # fetch account
+                pass
+
+            code = tokens[0].generateCode().code
+
+            if args.copy:
+                pyperclip.copy(code)
+                print("🥳 Code is in your clipboard!")
+            else:
+                print(code)
+        elif cmd == 'ls':
+            tokens = list_otp()
+            for t in enumerate(tokens, start=1):
+                print(f'{t[0]}. {t[1]}')
         elif cmd == 'config':
             configure.configure()
         else:

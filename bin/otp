@@ -1,5 +1,7 @@
 #!/usr/bin/env python
+import asyncio
+
 from otp import otp
 
 
-otp.run()
+asyncio.run(otp.run())

@@ -28,7 +28,7 @@ import functools
 import base64
 import math
 from enum import Enum
-
+from urllib.parse import unquote, urlparse
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ class TokenCode:
     @property
     def progress(self):
         """
-        Returns what progress was made until the expiry of the token
+        Returns the progress made until the expiry of the token
         , between 0 and 1
         """
         current = time.time()
@@ -79,8 +79,8 @@ class TokenType(Enum):
 
 
 class Token:
-    def __init__(self, t_type, issuer, user, secret,
-                 period, algorithm, digits):
+    def __init__(self, t_type, secret, issuer='undefined', user='undefined',
+                 period=30, algorithm='SHA-256', digits=6):
         self.type = t_type
         self.issuer = issuer
         self.user = user
@@ -191,10 +191,12 @@ class Token:
         return Token.fromUri(urlparse(unquote(string)))
 
     def __str__(self):
-        return f'Token[issuer={self.issuer}, user={self.user}]'
+        return f'{self.issuer} ({self.user})'
+
 
 class InvalidTokenUriError(Exception):
     def __init__(self, msg=None, value=None):
         self.args = (msg, value)
         self.msg = msg
         self.value = value
+
