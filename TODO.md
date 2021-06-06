@@ -1,35 +1,47 @@
-## BUGS
-* in case of missing configuration, stacktrace is dumped
-* sha-256 specified in config but sha-1 is in code
+# [cl-flags] prints all accounts
+$ otp
+github (user) 123456 12
+udemy (user) 123456 29
+binance (user) 123456 3
 
-## IMPROVE
-* versioning
-* remove QR code functionality
-* improve docs (with zero dependency)
+# [cl-flags] prints default profile with progress
+$ otp -p
+123456
 
-otp # show token from current profile
-otp --import-file
-otp --import  # config
-otp --profiles
-otp --delete-profile
-otp --use-profile
+# [cl-flags] copies into clipboard 
+$ otp -c
+123456
 
-## FEATURE
-* better user experience
-    - otp add --secret -- issuer --user --digits --algo --period
-    - remove get and `otp` to get code
-* profiles
-    - starred reference
-    - otp {id} # id optional
-    - otp ls
-    - otp add ...
-    - otp rm <id>
-* hotp support
+# [cl-flags] list accounts
+$ otp ls
+1. (*) issuer-1 for user
+2. issuer-2 for user
+3. issuer-3 for user
 
+# [multiple-accounts] support multiple accounts
+
+# [token-for-account] prints token for account with id 2
+$ otp -a 2
+
+# [auto-complete] select account with auto-complete
+$ otp -a git<Tab>
+github ...
+$ otp -a <Tab>
+github
+udemy
+binance
+
+# [timer-progress-bar] count down with ansi escape color codes
+$ otp
+issuer user <red>{code}</red>
+
+# [decode-qr-image]
 * decode qr code
-https://betterprogramming.pub/how-to-generate-and-decode-qr-codes-in-python-a933bce56fd0
+  https://betterprogramming.pub/how-to-generate-and-decode-qr-codes-in-python-a933bce56fd0
+* remove qr code export
+  
+# [sha-1 and sha-3 support]
+* SHA-1 SHA-3 support
 
-* bash auto-complete
-
-## TODO
-* release 0.2.0!
+# [hotp-support]
+* hotp support
