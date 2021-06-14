@@ -128,16 +128,14 @@ def create_qrcode(token):
 
 
 async def progress(token):
-    bar = Timer()
 
     while True:
         token_code = token.generateCode()
         current = token_code.progress
 
         progress = Progress(index=(current * token.period), mxm=token.period)
-        message = f'{token.issuer}, code = {token_code.code}'
-        bar.message = message
 
+        bar = Bar(token, token_code.code)
         progress.attach(bar)
 
         # iterate the remaining range

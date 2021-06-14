@@ -37,7 +37,7 @@ from otp.token import Token, TokenType, InvalidTokenUriError
 
 logger = logging.getLogger(__name__)
 
-CONFIG_PATH = os.environ["HOME"] + '/.otp/'+ '.otprc'
+CONFIG_PATH = os.environ["HOME"] + '/.otp/' + '.otprc'
 
 
 async def run():
@@ -51,19 +51,10 @@ async def run():
 
         logger.debug('Command=%s is being called %s', cmd)
         if cmd == None:
-            #config = configure.read()
-            #uri = urlparse(unquote(config))
-            #token = core.get_otp_by_uri(uri)
-
             tokens = list_otp()
 
-            # logger.debug('Built a new token %s', token)
             if args.progress:
-                # while True:
-                    #for token in tokens:
-                        #await core.progress(token)
-                    # core.progress_wrapper(token)
-                print("✨ Generating codes...")
+                print("🤖 Generating codes...")
                 await asyncio.gather(*(core.progress(token) for token in tokens))
 
             account = None
@@ -75,7 +66,7 @@ async def run():
 
             if args.copy:
                 pyperclip.copy(code)
-                print("🥳 Code is in your clipboard!")
+                print("Code is in your clipboard ✔️")
             else:
                 print(code)
         elif cmd == 'ls':
@@ -91,7 +82,91 @@ async def run():
     except KeyboardInterrupt:
         pass
     except Exception:
-        logger.error('Something\'s wrong here', exc_info=1)
+        logger.error('🤕 Oh no, something\'s wrong here', exc_info=1)
+
+
+def parse_otp_uri(uri):
+    if uri.scheme != 'otpauth':
+        raise InvalidTokenUriError('Invalid scheme')
+
+    params = parse_qs(uri.query)
+
+    secret = params.get('secret')
+    if secret:
+        secret = secret[0]
+        del params['secret']
+    else:
+        raise InvalidTokenUriError('Invalid secret')
+
+    kwargs = {'secret': secret, 'type': uri.netloc}
+    label = uri.path[1:]
+    issuer, user = label.split(':')
+    kwargs['issuer'] = issuer
+    kwargs['user'] = user
+
+    for k, v in params.items():
+        kwargs[k] = v[0]
+
+    return kwargs
+
+
+def list_otp():
+    tokens = []
+    with io.open(CONFIG_PATH, 'rt', encoding='UTF-8', newline=None) as f:
+        for index, line in enumerate(f):
+            uri = urlparse(unquote(line))
+            token_args = parse_otp_uri(uri)
+            secret = base64.b32decode(token_args['secret'])
+            period = int(token_args['period'])
+            digits = int(token_args['digits'])
+            t = Token(index, None, issuer=token_args['issuer'], user=token_args['user'], secret=secret,
+                      period=period, algorithm=token_args['algorithm'], digits=digits)
+            tokens.append(t)
+    return tokens
+
+
+def get_otp_by_secret(secret, **kwargs):
+    if not secret:
+        raise InvalidTokenUriError('Secret cannot be null')
+
+    try:
+        secret = base64.b32decode(secret)
+    except binascii.Error as e:
+        raise InvalidTokenUriError('Invalid secret', secret) from e
+
+    token_type = TokenType.fromValue(kwargs.get('type', 'hotp'))
+
+    issuer = kwargs.get('issuer')
+    user = kwargs.get('user')
+
+    period = kwargs.get('period')
+    try:
+        period = 30 if not period else int(period)
+    except ValueError as e:
+        raise InvalidTokenUriError('Invalid period', period) from e
+
+    digits = kwargs.get('digits')
+    try:
+        digits = 6 if not digits else int(digits)
+        if digits not in (6, 7, 8):
+            raise ValueError
+    except ValueError as e:
+        raise InvalidTokenUriError('Invalid digits', digits) from e
+
+    algorithm = kwargs.get('algorithm')
+    try:
+        algorithm = 'SHA1' if not algorithm else algorithm
+        if algorithm not in ('SHA1', 'SHA256', 'SHA512'):
+            raise ValueError
+    except ValueError as e:
+        raise InvalidTokenUriError('Invalid encryption algorithm',
+                                   algorithm) from e
+
+    return Token(t_type=token_type, issuer=issuer, user=user, secret=secret, period=period, algorithm=algorithm, digits=digits)
+
+
+def add_token():
+    pass
 
 
 if __name__ == '__main__':

@@ -24,11 +24,9 @@ import logging
 import time
 import hmac
 import hashlib
-import functools
 import base64
 import math
 from enum import Enum
-from urllib.parse import unquote, urlparse
 
 logger = logging.getLogger(__name__)
 
@@ -79,8 +77,9 @@ class TokenType(Enum):
 
 
 class Token:
-    def __init__(self, t_type, secret, issuer='undefined', user='undefined',
+    def __init__(self, index, t_type, secret, issuer='undefined', user='undefined',
                  period=30, algorithm='SHA-256', digits=6):
+        self.index = index
         self.type = t_type
         self.issuer = issuer
         self.user = user
@@ -199,4 +198,3 @@ class InvalidTokenUriError(Exception):
         self.args = (msg, value)
         self.msg = msg
         self.value = value
-

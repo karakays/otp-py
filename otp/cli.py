@@ -27,17 +27,19 @@ import logging
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-v', '--verbose', help='verbose output',
-                        action='store_const', dest='loglevel',
-                        const=logging.DEBUG, default=logging.INFO)
+    parser.add_argument('-c', '--copy', action='store_true', help='copy code to clipboard')
+    parser.add_argument('-p', '--progress', action='store_true', help='show progress bar')
+    parser.add_argument('-a', '--account', action='store_const', const='default', help='select account')
+    parser.add_argument('-v', '--verbose', action='store_const', const=logging.DEBUG, dest='loglevel',
+                        default=logging.INFO, help='verbose output')
 
     subparsers = parser.add_subparsers(dest='command')
-    subparsers.required = True
+    subparsers.required = False
 
-    subparsers.add_parser('get')
+    subparsers.add_parser('ls')
 
-    subparsers.add_parser('qrcode')
+    subparsers.add_parser('add')
 
-    subparsers.add_parser('config')
+    subparsers.add_parser('rm')
 
     return parser.parse_args()

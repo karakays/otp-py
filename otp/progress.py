@@ -20,11 +20,58 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import time
 import sys
+import time
 from datetime import timedelta
 
-vertical_tab_counter = 0
+
+CURSOR_POS = 0
+ANSI_CSI = "\x1B["
+
+
+class AnsiEscapes(object):
+
+    @staticmethod
+    def cursor_up(count=1):
+        return f"{ANSI_CSI}{str(count)}A"
+
+    @staticmethod
+    def cursor_down(count=1):
+        return f"{ANSI_CSI}{str(count)}B"
+
+    @staticmethod
+    def cursor_forward(count=1):
+        return f"{ANSI_CSI}{str(count)}C"
+
+    @staticmethod
+    def cursor_backward(count=1):
+        return f"{ANSI_CSI}{str(count)}D"
+
+    @staticmethod
+    def cursor_move(x, y):
+        if x > 0:
+            direction = AnsiEscapes.cursor_forward(x)
+        else:
+            direction = AnsiEscapes.cursor_backward(abs(x))
+
+        if y > 0:
+            direction += AnsiEscapes.cursor_up(y)
+        else:
+            direction += AnsiEscapes.cursor_down(abs(y))
+
+        return direction
+
+    @staticmethod
+    def red_color(text):
+        return f"{ANSI_CSI}32m{text}{ANSI_CSI}0m"
+
+    @staticmethod
+    def green_color(text):
+        return f"{ANSI_CSI}31m{text}{ANSI_CSI}0m"
+
+    @staticmethod
+    def yellow_color(text):
+        return f"{ANSI_CSI}33m{text}{ANSI_CSI}0m"
 
 
 class Progress(object):
@@ -91,35 +138,41 @@ class Bar(object):
     fill = '*'
     empty = '-'
     width = 40
-    vertical_tab = '\v'
-    line_feed = '\n'
 
-    def __init__(self, message=''):
-        self.message = message
-        global vertical_tab_counter
-        self.vertical_index = vertical_tab_counter
-        vertical_tab_counter += 1
+    def __init__(self, token, code):
+        self.token = token
+        self.code = code
 
-    # https://github.com/Yoskutik/awesome_progress_bar
     # https://tldp.org/HOWTO/Bash-Prompt-HOWTO/x361.html
     def update(self, progress):
+        global CURSOR_POS
         p = int(progress.progress * self.width)
         r = self.width - p
 
-        #sys.stdout.write("\x1b[6n")
-        #pos = sys.stdin.read(10)
-        #print(pos)
+        if progress.percent > 80:
+            token_code = AnsiEscapes.green_color(self.code)
+        elif progress.percent > 60:
+            token_code = AnsiEscapes.yellow_color(self.code)
+        else:
+            token_code = AnsiEscapes.red_color(self.code)
 
-        out = f"\r{self.message} [{p * self.fill}{r * self.empty}]\n"
+        out = f"\r🔑 {self.token.issuer} {token_code} [{p * self.fill}{r * self.empty}]"
+
+        cursor_pos = CURSOR_POS - self.token.index
+        txt = AnsiEscapes.cursor_move(0, cursor_pos)
+        sys.stdout.write(txt)
         sys.stdout.write(out)
         sys.stdout.flush()
+        CURSOR_POS = self.token.index
 
 
 class Timer(object):
-    def __init__(self, message=''):
+    def __init__(self, token, message=None):
+        self.token = token
         self.message = message
 
     def update(self, progress):
+        global CURSOR_POS
         if progress.percent > 80:
             level = "\033[31m"
         elif progress.percent > 60:
@@ -127,6 +180,9 @@ class Timer(object):
         else:
             level = "\033[32m"
 
-        out = f"\r{self.message} {level} {int(progress.remaining)} seconds\033[0m\n"
+        out = f"\r🔑 {self.message} {level} {int(progress.remaining)} seconds\033[0m"
+        cursor_dir = f"\x1b[{abs(CURSOR_POS - self.token.index)}{'A' if CURSOR_POS - self.token.index > 0 else 'B'}"
+        sys.stdout.write(cursor_dir)
         sys.stdout.write(out)
         sys.stdout.flush()
+        CURSOR_POS = self.token.index

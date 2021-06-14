@@ -1,8 +1,13 @@
-# [cl-flags] prints all accounts
+# [multiple-accounts] support multiple accounts
+* show codes from multiple accounts
+* concurrency support
+* concurrency in stdout. codes need to know terminal position to render progress bar.
+* ansi-escapes
+
+# [timer-progress-bar] count down with ansi escape color codes
 $ otp
-github (user) 123456 12
-udemy (user) 123456 29
-binance (user) 123456 3
+<issuer> <red>{code}</red> <spinner> <seconds>
+- spinner from https://github.com/Yoskutik/awesome_progress_bar
 
 # [cl-flags] prints default profile with progress
 $ otp -p
@@ -18,8 +23,6 @@ $ otp ls
 2. issuer-2 for user
 3. issuer-3 for user
 
-# [multiple-accounts] support multiple accounts
-
 # [token-for-account] prints token for account with id 2
 $ otp -a 2
 
@@ -31,10 +34,6 @@ github
 udemy
 binance
 
-# [timer-progress-bar] count down with ansi escape color codes
-$ otp
-issuer user <red>{code}</red>
-
 # [decode-qr-image]
 * decode qr code
   https://betterprogramming.pub/how-to-generate-and-decode-qr-codes-in-python-a933bce56fd0
@@ -45,3 +44,6 @@ issuer user <red>{code}</red>
 
 # [hotp-support]
 * hotp support
+
+# [desktop-apps]
+* Electron?

@@ -15,7 +15,7 @@ setup(
     maintainer='Selçuk Karakayalı',
     url='http://github.com/karakays/otp-py/',
     packages=find_packages(),
-    install_requires=['pyqrcode>=1.2.1', 'cv2'],
+    install_requires=['pyqrcode>=1.2.1', 'pyperclip'],
     python_requires='>=3.6',
     license='MIT',
     keywords=['otp', 'otp-codes', 'otp-generator', 'authenticator'],
