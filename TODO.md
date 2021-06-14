@@ -34,6 +34,10 @@ github
 udemy
 binance
 
+# [add] add otp
+- otp add --secret -- issuer --user --digits --algo --period
+only issuer and secret mandatory
+
 # [decode-qr-image]
 * decode qr code
   https://betterprogramming.pub/how-to-generate-and-decode-qr-codes-in-python-a933bce56fd0

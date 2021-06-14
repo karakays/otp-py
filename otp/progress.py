@@ -62,6 +62,10 @@ class AnsiEscapes(object):
         return direction
 
     @staticmethod
+    def clear_line():
+        return f"{ANSI_CSI}2K"
+
+    @staticmethod
     def red_color(text):
         return f"{ANSI_CSI}32m{text}{ANSI_CSI}0m"
 
@@ -159,30 +163,41 @@ class Bar(object):
         out = f"\r🔑 {self.token.issuer} {token_code} [{p * self.fill}{r * self.empty}]"
 
         cursor_pos = CURSOR_POS - self.token.index
-        txt = AnsiEscapes.cursor_move(0, cursor_pos)
-        sys.stdout.write(txt)
+        sys.stdout.write(AnsiEscapes.cursor_move(0, cursor_pos))
         sys.stdout.write(out)
         sys.stdout.flush()
         CURSOR_POS = self.token.index
 
 
 class Timer(object):
-    def __init__(self, token, message=None):
+    spinner = '⠁⠉⠙⠸⢰⣠⣄⡆⠇⠃'
+    issuer_pad = 0
+
+    def __init__(self, token, code):
+        self.spinner_index = 0
         self.token = token
-        self.message = message
+        self.code = code
 
     def update(self, progress):
         global CURSOR_POS
-        if progress.percent > 80:
-            level = "\033[31m"
-        elif progress.percent > 60:
-            level = "\033[33m"
-        else:
-            level = "\033[32m"
 
-        out = f"\r🔑 {self.message} {level} {int(progress.remaining)} seconds\033[0m"
-        cursor_dir = f"\x1b[{abs(CURSOR_POS - self.token.index)}{'A' if CURSOR_POS - self.token.index > 0 else 'B'}"
-        sys.stdout.write(cursor_dir)
+        self.spinner_index = (self.spinner_index + 1) % len(Timer.spinner)
+
+        if progress.percent > 80:
+            token_code = AnsiEscapes.green_color(self.code)
+        elif progress.percent > 60:
+            token_code = AnsiEscapes.yellow_color(self.code)
+        else:
+            token_code = AnsiEscapes.red_color(self.code)
+
+        if len(self.token.issuer) > Timer.issuer_pad:
+            Timer.issuer_pad = len(self.token.issuer)
+
+        out = f"\r🔑️ {self.token.issuer.ljust(Timer.issuer_pad)} ➡ {token_code} {Timer.spinner[self.spinner_index]} {int(progress.remaining)}"
+
+        cursor_pos = CURSOR_POS - self.token.index
+        sys.stdout.write(AnsiEscapes.cursor_move(0, cursor_pos))
+        sys.stdout.write(AnsiEscapes.clear_line())
         sys.stdout.write(out)
         sys.stdout.flush()
         CURSOR_POS = self.token.index
