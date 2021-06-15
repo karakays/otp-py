@@ -19,30 +19,21 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import base64
-import io
-import logging
-import os
 import asyncio
-
-from urllib.parse import urlparse, unquote, parse_qs
+import base64
+import logging
 
 import pyperclip
 
-from otp import cli
-from otp import configure
+from otp import configure, TOKENS
 from otp import core
-
 from otp.token import Token, TokenType, InvalidTokenUriError
 
 logger = logging.getLogger(__name__)
 
-CONFIG_PATH = os.environ["HOME"] + '/.otp/' + '.otprc'
 
-
-async def run():
+async def run(args):
     try:
-        args = cli.parse_args()
         args_dict = {k: v for k, v in vars(args).items() if v}
 
         logging.basicConfig(level=args_dict.pop('loglevel'))
@@ -50,29 +41,21 @@ async def run():
         cmd = args_dict.get('command')
 
         logger.debug('Command=%s is being called %s', cmd)
-        if cmd == None:
-            tokens = list_otp()
-
-            if args.progress:
-                print("🤖 Generating codes...")
-                await asyncio.gather(*(core.progress(token) for token in tokens))
-
-            account = None
+        if cmd is None:
             if args.account:
-                # fetch account
-                pass
-
-            code = tokens[0].generateCode().code
-
-            if args.copy:
-                pyperclip.copy(code)
-                print("Code is in your clipboard ✔️")
+                token = TOKENS[args.account]
+                if args.copy:
+                    code = token.generateCode().code
+                    pyperclip.copy(code)
+                    print("Code is in your clipboard ✔️")
+                else:
+                    await asyncio.gather(core.progress(token))
             else:
-                print(code)
+                print("🤖 Generating codes...")
+                await asyncio.gather(*(core.progress(token) for token in TOKENS.values()))
         elif cmd == 'ls':
-            tokens = list_otp()
-            for t in enumerate(tokens, start=1):
-                print(f'{t[0]}. {t[1]}')
+            for t in TOKENS.values():
+                print(f'{t.index}: {t}')
         elif cmd == 'config':
             configure.configure()
         else:
@@ -83,46 +66,6 @@ async def run():
         pass
     except Exception:
         logger.error('🤕 Oh no, something\'s wrong here', exc_info=1)
-
-
-def parse_otp_uri(uri):
-    if uri.scheme != 'otpauth':
-        raise InvalidTokenUriError('Invalid scheme')
-
-    params = parse_qs(uri.query)
-
-    secret = params.get('secret')
-    if secret:
-        secret = secret[0]
-        del params['secret']
-    else:
-        raise InvalidTokenUriError('Invalid secret')
-
-    kwargs = {'secret': secret, 'type': uri.netloc}
-    label = uri.path[1:]
-    issuer, user = label.split(':')
-    kwargs['issuer'] = issuer
-    kwargs['user'] = user
-
-    for k, v in params.items():
-        kwargs[k] = v[0]
-
-    return kwargs
-
-
-def list_otp():
-    tokens = []
-    with io.open(CONFIG_PATH, 'rt', encoding='UTF-8', newline=None) as f:
-        for index, line in enumerate(f):
-            uri = urlparse(unquote(line))
-            token_args = parse_otp_uri(uri)
-            secret = base64.b32decode(token_args['secret'])
-            period = int(token_args['period'])
-            digits = int(token_args['digits'])
-            t = Token(index, None, issuer=token_args['issuer'], user=token_args['user'], secret=secret,
-                      period=period, algorithm=token_args['algorithm'], digits=digits)
-            tokens.append(t)
-    return tokens
 
 
 def get_otp_by_secret(secret, **kwargs):
@@ -170,4 +113,4 @@ def add_token():
 
 
 if __name__ == '__main__':
-    run()
+    run(None)

@@ -1,7 +1,27 @@
 #!/usr/bin/env python
+import argparse
 import asyncio
+import logging
 
-from otp import otp
+from otp import otp, TOKENS
 
+parser = argparse.ArgumentParser()
 
-asyncio.run(otp.run())
+parser.add_argument('-c', '--copy', action='store_true', help='copy code to clipboard')
+parser.add_argument('-a', '--account', action='store', type=int, choices=TOKENS.keys(), help='select account')
+parser.add_argument('-v', '--verbose', action='store_const', const=logging.DEBUG, dest='loglevel',
+                    default=logging.INFO, help='verbose output')
+
+subparsers = parser.add_subparsers(dest='command')
+subparsers.required = False
+
+subparsers.add_parser('ls')
+subparsers.add_parser('add')
+subparsers.add_parser('rm')
+
+args = parser.parse_args()
+
+if args.copy and args.account is None:
+    parser.error("--copy requires --account")
+
+asyncio.run(otp.run(args))
