@@ -20,12 +20,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import logging
-import time
-import hmac
-import hashlib
 import base64
+import hashlib
+import hmac
+import logging
 import math
+import time
 from enum import Enum
 
 logger = logging.getLogger(__name__)

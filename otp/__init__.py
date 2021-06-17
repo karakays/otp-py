@@ -31,7 +31,7 @@ from . import token
 from . import configure
 from .token import InvalidTokenUriError, Token
 
-CONFIG_PATH = os.environ["HOME"] + '/.otp/' + '.otprc'
+CONFIG_PATH = os.environ["HOME"] + '/.otp/' + 'config'
 
 TOKENS = {}
 
@@ -62,7 +62,8 @@ def parse_otp_uri(uri):
 
 
 with io.open(CONFIG_PATH, 'rt', encoding='UTF-8', newline=None) as f:
-    for index, line in enumerate(f, start=1):
+    sanitized = (line for line in f if not line.lstrip().startswith("#"))
+    for index, line in enumerate(sanitized, start=1):
         uri = urlparse(unquote(line))
         token_args = parse_otp_uri(uri)
         secret = base64.b32decode(token_args['secret'])

@@ -25,7 +25,7 @@ import time
 from datetime import timedelta
 
 
-CURSOR_POS = 0
+CURSOR_POS = 1
 ANSI_CSI = "\x1B["
 
 
@@ -49,14 +49,15 @@ class AnsiEscapes(object):
 
     @staticmethod
     def cursor_move(x, y):
+        direction = ''
         if x > 0:
             direction = AnsiEscapes.cursor_forward(x)
-        else:
+        elif x < 0:
             direction = AnsiEscapes.cursor_backward(abs(x))
 
         if y > 0:
             direction += AnsiEscapes.cursor_up(y)
-        else:
+        elif y < 0:
             direction += AnsiEscapes.cursor_down(abs(y))
 
         return direction

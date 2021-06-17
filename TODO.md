@@ -1,6 +1,7 @@
 # [auto-complete] select account with auto-complete
 $ otp -a git<Tab>
 github ...
+
 $ otp -a <Tab>
 github:karakays
 udemy:skarakayali
