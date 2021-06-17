@@ -40,6 +40,7 @@ Current configuration can be embedded in a QR code by using ``qrcode`` command.
 
 .. image:: img/demo.gif
     :align: center
+
 ---------------
 References
 ---------------
@@ -57,3 +58,4 @@ otp-gen is under `MIT license`_
 .. _`RFC 4226`: http://tools.ietf.org/html/rfc4226
 .. _`RFC 6238`: http://tools.ietf.org/html/rfc6238
 .. _`MIT license`: https://opensource.org/licenses/MIT
+

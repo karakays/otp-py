@@ -31,4 +31,4 @@ release:
 	git push origin master --tags
 
 publish:
-	twine upload dist/*
+	twine check dist/* && twine upload dist/*
