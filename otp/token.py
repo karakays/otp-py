@@ -77,16 +77,15 @@ class TokenType(Enum):
 
 
 class Token:
-    def __init__(self, index, t_type, secret, issuer='undefined', user='undefined',
-                 period=30, algorithm='SHA-256', digits=6):
-        self.index = index
-        self.type = t_type
+    def __init__(self, issuer, secret, **kwargs):
         self.issuer = issuer
-        self.user = user
         self.secret = secret
-        self.period = period
-        self.algorithm = algorithm
-        self.digits = digits
+        self.index = kwargs.get('index')
+        self.type = kwargs.get('type', 'totp')
+        self.user = kwargs.get('user')
+        self.period = kwargs.get('period', 30)
+        self.algorithm = kwargs.get('algorithm', 'SHA-1')
+        self.digits = kwargs.get('digits', 6)
 
     def toUri(self):
         """

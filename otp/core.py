@@ -30,7 +30,7 @@ from otp.progress import Progress, Timer
 def create_uri(token):
     """
     otpauh://TYPE/LABEL?PARAMS
-    where LABEL of form issuer:account
+    where LABEL is of form issuer:account
     """
     query = {'secret': base64.b32encode(token.secret), 'period': token.period,
              'algorithm': token.algorithm, 'digits': token.digits}

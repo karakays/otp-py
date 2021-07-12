@@ -1,9 +1,19 @@
 #!/usr/bin/env python
 import argparse
 import asyncio
+import base64
+import binascii
 import logging
 
 from otp import otp, TOKENS
+
+
+def parse_secret(secret):
+    try:
+        return base64.b32decode(secret)
+    except binascii.Error:
+        parser.error(f"{secret} is not a valid secret")
+
 
 parser = argparse.ArgumentParser()
 
@@ -16,8 +26,15 @@ subparsers = parser.add_subparsers(dest='command')
 subparsers.required = False
 
 subparsers.add_parser('ls')
-subparsers.add_parser('add')
-subparsers.add_parser('rm')
+add_parser = subparsers.add_parser('add')
+rm_parser = subparsers.add_parser('rm')
+
+add_parser.add_argument('-i', '--issuer', action='store', required=True, help='account provider')
+add_parser.add_argument('-s', '--secret', action='store', type=parse_secret, required=True, help='base32 encoded secret key')
+add_parser.add_argument('-u', '--user', action='store', help='user identifier')
+add_parser.add_argument('-d', '--digits', action='store', type=int,  choices=(6, 7, 8), help='length of passcode')
+add_parser.add_argument('-a', '--algo', action='store', choices=(['SHA-1']), help='algorithm')
+add_parser.add_argument('-p', '--period', action='store', help='period passcode valid for, in seconds')
 
 args = parser.parse_args()
 

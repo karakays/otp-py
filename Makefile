@@ -16,7 +16,7 @@ clean-pyc:
 	find . -name '*.pyo' -exec rm -f {} +
 	find . -name __pycache__ -delete
 
-bdist:
+build:
 	$(PYTHON) setup.py bdist
 
 sdist:

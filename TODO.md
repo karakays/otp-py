@@ -7,9 +7,12 @@ github:karakays
 udemy:skarakayali
 binance
 
-# [add] add otp
+# [rm] remove otp
 - otp add --secret -- issuer --user --digits --algo --period
 only issuer and secret mandatory
+
+# [rm] rm by completion
+- otp rm <Tab>
 
 # [decode-qr-image]
 * decode qr code

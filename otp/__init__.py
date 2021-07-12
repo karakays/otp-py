@@ -28,8 +28,9 @@ from . import core
 from . import qr_code
 from . import progress
 from . import token
-from . import configure
 from .token import InvalidTokenUriError, Token
+
+os.makedirs(os.environ["HOME"] + '/.otp/', 0o774, exist_ok=True)
 
 CONFIG_PATH = os.environ["HOME"] + '/.otp/' + 'config'
 
@@ -51,7 +52,7 @@ def parse_otp_uri(uri):
 
     kwargs = {'secret': secret, 'type': uri.netloc}
     label = uri.path[1:]
-    issuer, user = label.split(':')
+    issuer, user = (label.split(':')) if ':' in label else (label, None)
     kwargs['issuer'] = issuer
     kwargs['user'] = user
 
@@ -66,9 +67,10 @@ with io.open(CONFIG_PATH, 'rt', encoding='UTF-8', newline=None) as f:
     for index, line in enumerate(sanitized, start=1):
         uri = urlparse(unquote(line))
         token_args = parse_otp_uri(uri)
-        secret = base64.b32decode(token_args['secret'])
-        period = int(token_args['period'])
-        digits = int(token_args['digits'])
-        t = Token(index, None, issuer=token_args['issuer'], user=token_args['user'], secret=secret,
-                  period=period, algorithm=token_args['algorithm'], digits=digits)
+        token_args['index'] = index
+        issuer = token_args.pop('issuer')
+        secret = base64.b32decode(token_args.pop('secret'))
+        token_args.update(period=int(token_args['period']))
+        token_args.update(digits=int(token_args['digits']))
+        t = Token(issuer, secret, **token_args)
         TOKENS[index] = t
