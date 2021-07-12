@@ -24,10 +24,6 @@ import io
 import os
 from urllib.parse import urlparse, parse_qs, unquote
 
-from . import core
-from . import qr_code
-from . import progress
-from . import token
 from .token import InvalidTokenUriError, Token
 
 os.makedirs(os.environ["HOME"] + '/.otp/', 0o774, exist_ok=True)
@@ -72,5 +68,4 @@ with io.open(CONFIG_PATH, 'rt', encoding='UTF-8', newline=None) as f:
         secret = base64.b32decode(token_args.pop('secret'))
         token_args.update(period=int(token_args['period']))
         token_args.update(digits=int(token_args['digits']))
-        t = Token(issuer, secret, **token_args)
-        TOKENS[index] = t
+        TOKENS[index] = Token(issuer, secret, **token_args)

@@ -36,6 +36,8 @@ add_parser.add_argument('-d', '--digits', action='store', type=int,  choices=(6,
 add_parser.add_argument('-a', '--algo', action='store', choices=(['SHA-1']), help='algorithm')
 add_parser.add_argument('-p', '--period', action='store', help='period passcode valid for, in seconds')
 
+rm_parser.add_argument('-a', '--account', action='store', required=True, type=int, choices=TOKENS.keys(), help='select account to remove')
+
 args = parser.parse_args()
 
 if args.copy and args.account is None:

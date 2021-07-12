@@ -87,7 +87,8 @@ class Token:
         self.algorithm = kwargs.get('algorithm', 'SHA-1')
         self.digits = kwargs.get('digits', 6)
 
-    def toUri(self):
+    @property
+    def uri(self):
         """
         otpauh://TYPE/LABEL?PARAMS where
         LABEL is issuer:user

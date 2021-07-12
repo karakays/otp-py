@@ -26,7 +26,7 @@ import pyperclip
 
 from otp import TOKENS, CONFIG_PATH
 from otp import core
-from otp.token import Token, TokenType, InvalidTokenUriError
+from otp.token import Token, InvalidTokenUriError
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +63,12 @@ async def run(args):
             uri = core.create_uri(token)
             with io.open(CONFIG_PATH, 'a+', encoding='UTF-8', newline=None) as f:
                 f.write(uri + os.linesep)
+        elif cmd == 'rm':
+            import io, os
+            TOKENS.pop(args.account)
+            with io.open(CONFIG_PATH, 'w', encoding='UTF-8', newline=None) as f:
+                for token in TOKENS.values():
+                    f.write(token.uri + os.linesep)
     except InvalidTokenUriError:
         logger.error('Invalid token', exc_info=1)
     except KeyboardInterrupt:
