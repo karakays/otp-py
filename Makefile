@@ -26,9 +26,9 @@ install:
 	$(PYTHON) setup.py install
 
 release:
-	git tag -s $(VERSION) -m "$(VERSION)"
-	$(PYTHON) setup.py check sdist
+	git tag $(VERSION) -m "$(VERSION)"
 	git push origin master --tags
 
 publish:
+	$(PYTHON) setup.py check sdist
 	twine check dist/* && twine upload dist/*

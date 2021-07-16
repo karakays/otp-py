@@ -9,5 +9,9 @@
 # [hotp-support]
 * hotp support
 
+# [shipment]
+* Platform packages:
+- apt - brew
+
 # [desktop-apps]
 * Electron?

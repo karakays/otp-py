@@ -30,7 +30,7 @@ os.makedirs(os.environ["HOME"] + '/.otp/', 0o774, exist_ok=True)
 
 CONFIG_PATH = os.environ["HOME"] + '/.otp/' + 'config'
 
-TOKENS = {}
+TOKENS = dict()
 
 
 def parse_otp_uri(uri):

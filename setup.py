@@ -2,7 +2,7 @@
 # -*- coding: utf-8
 from setuptools import setup, find_packages
 
-pkg_vars = {}
+pkg_vars = dict()
 
 with open("otp/_version.py") as fp:
     exec(fp.read(), pkg_vars)
