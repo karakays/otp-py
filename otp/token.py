@@ -101,6 +101,10 @@ class Token:
                            self.issuer + ':' + self.user,
                            urlencode(query), None))
 
+    @property
+    def id(self):
+        return f'{self.issuer}:{self.user}'
+
     def generateCode(self):
         start = time.time()
         counter = int(start / self.period)
@@ -190,7 +194,7 @@ class Token:
         return Token.fromUri(urlparse(unquote(string)))
 
     def __str__(self):
-        return f'{self.issuer} ({self.user})'
+        return f'{self.issuer}:{self.user}'
 
 
 class InvalidTokenUriError(Exception):

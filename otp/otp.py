@@ -54,7 +54,7 @@ async def run(args):
                 await asyncio.gather(*(core.progress(token) for token in TOKENS.values()))
         elif cmd == 'ls':
             for t in TOKENS.values():
-                print(f'{t.index}: {t}')
+                print(f'{t}')
         elif cmd == 'add':
             import io, os
             issuer = argsd.pop('issuer')

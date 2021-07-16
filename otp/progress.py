@@ -191,10 +191,10 @@ class Timer(object):
         else:
             token_code = AnsiEscapes.red_color(self.code)
 
-        if len(self.token.issuer) > Timer.issuer_pad:
-            Timer.issuer_pad = len(self.token.issuer)
+        if len(self.token.id) > Timer.issuer_pad:
+            Timer.issuer_pad = len(self.token.id)
 
-        out = f"\r🔑️ {self.token.issuer.ljust(Timer.issuer_pad)} ➡ {token_code} {Timer.spinner[self.spinner_index]} {int(progress.remaining)}"
+        out = f"\r🔑️ {self.token.id.ljust(Timer.issuer_pad)} ➡ {token_code} {Timer.spinner[self.spinner_index]} {int(progress.remaining)}"
 
         cursor_pos = CURSOR_POS - self.token.index
         sys.stdout.write(AnsiEscapes.cursor_move(0, cursor_pos))

@@ -66,6 +66,7 @@ with io.open(CONFIG_PATH, 'rt', encoding='UTF-8', newline=None) as f:
         token_args['index'] = index
         issuer = token_args.pop('issuer')
         secret = base64.b32decode(token_args.pop('secret'))
+        key = issuer + ':' + token_args.get('user')
         token_args.update(period=int(token_args['period']))
         token_args.update(digits=int(token_args['digits']))
-        TOKENS[index] = Token(issuer, secret, **token_args)
+        TOKENS[key] = Token(issuer, secret, **token_args)

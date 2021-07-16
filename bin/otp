@@ -18,7 +18,7 @@ def parse_secret(secret):
 parser = argparse.ArgumentParser()
 
 parser.add_argument('-c', '--copy', action='store_true', help='copy code to clipboard')
-parser.add_argument('-a', '--account', action='store', type=int, choices=TOKENS.keys(), help='select account')
+parser.add_argument('-a', '--account', action='store', type=str, choices=TOKENS.keys(), help='select account')
 parser.add_argument('-v', '--verbose', action='store_const', const=logging.DEBUG, dest='loglevel',
                     default=logging.INFO, help='verbose output')
 
@@ -33,7 +33,7 @@ add_parser.add_argument('-i', '--issuer', action='store', required=True, help='a
 add_parser.add_argument('-s', '--secret', action='store', type=parse_secret, required=True, help='base32 encoded secret key')
 add_parser.add_argument('-u', '--user', action='store', help='user identifier')
 add_parser.add_argument('-d', '--digits', action='store', type=int,  choices=(6, 7, 8), help='length of passcode')
-add_parser.add_argument('-a', '--algo', action='store', choices=(['SHA-1']), help='algorithm')
+add_parser.add_argument('-a', '--algo', action='store', choices=(['SHA1']), help='algorithm')
 add_parser.add_argument('-p', '--period', action='store', help='period passcode valid for, in seconds')
 
 rm_parser.add_argument('-a', '--account', action='store', required=True, type=int, choices=TOKENS.keys(), help='select account to remove')
