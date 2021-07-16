@@ -15,20 +15,26 @@ def parse_secret(secret):
         parser.error(f"{secret} is not a valid secret")
 
 
+def version():
+    pkg_vars = {}
+    with open("otp/_version.py") as fp:
+        exec(fp.read(), pkg_vars)
+    return pkg_vars['__version__']
+
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument('-c', '--copy', action='store_true', help='copy code to clipboard')
 parser.add_argument('-a', '--account', action='store', type=str, choices=TOKENS.keys(), help='select account')
-parser.add_argument('-v', '--verbose', action='store_const', const=logging.DEBUG, dest='loglevel',
+parser.add_argument('-d', '--debug', action='store_const', const=logging.DEBUG, dest='loglevel',
                     default=logging.INFO, help='verbose output')
+parser.add_argument('-v', '--version', action='version', version=f'%(prog)s {version()}')
 
 subparsers = parser.add_subparsers(dest='command')
 subparsers.required = False
 
 subparsers.add_parser('ls')
 add_parser = subparsers.add_parser('add')
-rm_parser = subparsers.add_parser('rm')
-
 add_parser.add_argument('-i', '--issuer', action='store', required=True, help='account provider')
 add_parser.add_argument('-s', '--secret', action='store', type=parse_secret, required=True, help='base32 encoded secret key')
 add_parser.add_argument('-u', '--user', action='store', help='user identifier')
@@ -36,6 +42,7 @@ add_parser.add_argument('-d', '--digits', action='store', type=int,  choices=(6,
 add_parser.add_argument('-a', '--algo', action='store', choices=(['SHA1']), help='algorithm')
 add_parser.add_argument('-p', '--period', action='store', help='period passcode valid for, in seconds')
 
+rm_parser = subparsers.add_parser('rm')
 rm_parser.add_argument('-a', '--account', action='store', required=True, type=int, choices=TOKENS.keys(), help='select account to remove')
 
 args = parser.parse_args()
