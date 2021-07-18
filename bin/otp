@@ -5,7 +5,7 @@ import base64
 import binascii
 import logging
 
-from otp import otp, TOKENS
+from otp import _version, otp, TOKENS
 
 
 def parse_secret(secret):
@@ -15,20 +15,13 @@ def parse_secret(secret):
         parser.error(f"{secret} is not a valid secret")
 
 
-def version():
-    pkg_vars = {}
-    with open("otp/_version.py") as fp:
-        exec(fp.read(), pkg_vars)
-    return pkg_vars['__version__']
-
-
 parser = argparse.ArgumentParser()
 
 parser.add_argument('-c', '--copy', action='store_true', help='copy code to clipboard')
 parser.add_argument('-a', '--account', action='store', type=str, choices=TOKENS.keys(), help='select account')
 parser.add_argument('-d', '--debug', action='store_const', const=logging.DEBUG, dest='loglevel',
                     default=logging.INFO, help='verbose output')
-parser.add_argument('-v', '--version', action='version', version=f'%(prog)s {version()}')
+parser.add_argument('-v', '--version', action='version', version=f'%(prog)s {_version.__version__}')
 
 subparsers = parser.add_subparsers(dest='command')
 subparsers.required = False

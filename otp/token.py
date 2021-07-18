@@ -28,6 +28,8 @@ import math
 import time
 from enum import Enum
 
+logger = logging.getLogger(__name__)
+
 
 class TokenCode:
     def __init__(self, code, start, end):
