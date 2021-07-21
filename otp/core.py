@@ -24,7 +24,7 @@ import base64
 from urllib.parse import urlunsplit, urlencode
 
 from otp import qr_code
-from otp.progress import Progress, Timer
+from otp.progress import Progress, Timer, PB_PERIOD, PB_FREQUENCY
 
 
 def create_uri(token):
@@ -59,12 +59,12 @@ async def progress(token):
         bar = Timer(token, token_code.code)
         progress.attach(bar)
 
-        # iterate the remaining range
-        # let progress bar render until token expires completely
-        rem_rng = range(token_code.remaining)
+        rem_time_steps = range(token_code.remaining * PB_FREQUENCY)
 
-        for i in progress.iter(rem_rng):
-            await asyncio.sleep(1)
+        # iterate the remaining range
+        # let it progress until token expires
+        for i in progress.iter(rem_time_steps):
+            await asyncio.sleep(PB_PERIOD)
 
 
 class Account:

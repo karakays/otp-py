@@ -12,6 +12,10 @@
 # [shipment]
 * Platform packages:
 - apt - brew
+- docker
+
+# [bug]
+- hide cursor when counting
 
 # [desktop-apps]
 * Electron?

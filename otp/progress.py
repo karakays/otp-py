@@ -22,11 +22,15 @@
 
 import sys
 import time
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 
 CURSOR_POS = 1
 ANSI_CSI = "\x1B["
+
+PB_PERIOD = 0.1
+PB_FREQUENCY = int(1 / PB_PERIOD)
+PB_TIME_STEP = PB_PERIOD
 
 
 class AnsiEscapes(object):
@@ -81,26 +85,21 @@ class AnsiEscapes(object):
 
 class Progress(object):
     def __init__(self, *args, **kwargs):
-        index = kwargs.get('index')
-        self.index = index if index else 0
-        mxm = kwargs.get('mxm')
-        self.max = mxm if mxm else 100
-        self.start = time.time()
+        self._index = kwargs.get('index', 0)
+        self._finish = kwargs.get('mxm', 100)
+        self.created = datetime.now()
+        self.start_time = self.created - timedelta(seconds=self._index)
+        self.step_start = self.created
         self.avg = 0
-        self.step_start = self.start
         self.observers = []
 
     @property
-    def elapsed(self):
-        return int(time.time() - self.start)
-
-    @property
-    def elapsed_td(self):
-        return timedelta(seconds=self.elapsed)
+    def elapsed_time(self):
+        return datetime.now() - self.start_time
 
     @property
     def progress(self):
-        return min(1, self.index / self.max)
+        return min(1, self._index / self._finish)
 
     @property
     def percent(self):
@@ -108,25 +107,29 @@ class Progress(object):
 
     @property
     def remaining(self):
-        return max(0, self.max - self.index)
+        return max(0, self._finish - self._index)
 
-    def finish(self):
+    @property
+    def remaining_time(self):
+        return timedelta(seconds=max(0, self._finish - self._index))
+
+    def finalize(self):
         pass
 
     def next(self, i=1):
-        now = time.time()
+        now = datetime.now()
         dt = now - self.step_start
         self.step_start = now
-        self.index = self.index + i
+        self._index = self._index + i
         self.notify()
 
     def iter(self, it):
         try:
             for i in it:
                 yield i
-                self.next()
+                self.next(PB_TIME_STEP)
         finally:
-            self.finish()
+            self.finalize()
 
     def attach(self, observer):
         self.observers.append(observer)
@@ -137,6 +140,13 @@ class Progress(object):
     def notify(self):
         for o in self.observers:
             o.update(self)
+
+    def __str__(self):
+        return f"Progress index={self._index}," \
+               f"fin={self._finish}," \
+               f"remaining={self.remaining}," \
+               f"remaining_time={self.remaining_time}" \
+               f"elapsed_time={self.elapsed_time}"
 
 
 class Bar(object):
@@ -163,16 +173,16 @@ class Bar(object):
 
         out = f"\r🔑 {self.token.issuer} {token_code} [{p * self.fill}{r * self.empty}]"
 
-        cursor_pos = CURSOR_POS - self.token.index
+        cursor_pos = CURSOR_POS - self.token._index
         sys.stdout.write(AnsiEscapes.cursor_move(0, cursor_pos))
         sys.stdout.write(out)
         sys.stdout.flush()
-        CURSOR_POS = self.token.index
+        CURSOR_POS = self.token._index
 
 
 class Timer(object):
     spinner = '⠁⠉⠙⠸⢰⣠⣄⡆⠇⠃'
-    issuer_pad = 0
+    issuer_padding = 0
 
     def __init__(self, token, code):
         self.spinner_index = 0
@@ -191,14 +201,15 @@ class Timer(object):
         else:
             token_code = AnsiEscapes.red_color(self.code)
 
-        if len(self.token.id) > Timer.issuer_pad:
-            Timer.issuer_pad = len(self.token.id)
+        if len(self.token.id) > Timer.issuer_padding:
+            Timer.issuer_padding = len(self.token.id)
 
-        out = f"\r🔑️ {self.token.id.ljust(Timer.issuer_pad)} ➡ {token_code} {Timer.spinner[self.spinner_index]} {int(progress.remaining)}"
+        out = f"\r🔑️ {self.token.id.ljust(Timer.issuer_padding)} ➡ {token_code} " \
+              f"{Timer.spinner[self.spinner_index]} {int(progress.remaining_time.seconds)}"
 
-        cursor_pos = CURSOR_POS - self.token.index
+        cursor_pos = CURSOR_POS - self.token._index
         sys.stdout.write(AnsiEscapes.cursor_move(0, cursor_pos))
         sys.stdout.write(AnsiEscapes.clear_line())
         sys.stdout.write(out)
         sys.stdout.flush()
-        CURSOR_POS = self.token.index
+        CURSOR_POS = self.token._index

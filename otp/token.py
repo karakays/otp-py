@@ -80,7 +80,7 @@ class Token:
     def __init__(self, issuer, secret, **kwargs):
         self.issuer = issuer
         self.secret = secret
-        self.index = kwargs.get('index')
+        self._index = kwargs.get('index')
         self.type = kwargs.get('type', 'totp')
         self.user = kwargs.get('user')
         self.period = kwargs.get('period', 30)
