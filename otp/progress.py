@@ -21,7 +21,6 @@
 # SOFTWARE.
 
 import sys
-import time
 from datetime import datetime, timedelta
 
 
@@ -67,6 +66,14 @@ class AnsiEscapes(object):
         return direction
 
     @staticmethod
+    def hide_cursor():
+        return f"{ANSI_CSI}?25l"
+
+    @staticmethod
+    def show_cursor():
+        return f"{ANSI_CSI}?25h"
+
+    @staticmethod
     def clear_line():
         return f"{ANSI_CSI}2K"
 
@@ -84,7 +91,7 @@ class AnsiEscapes(object):
 
 
 class Progress(object):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         self._index = kwargs.get('index', 0)
         self._finish = kwargs.get('mxm', 100)
         self.created = datetime.now()
@@ -92,6 +99,7 @@ class Progress(object):
         self.step_start = self.created
         self.avg = 0
         self.observers = []
+        sys.stdout.write(AnsiEscapes.hide_cursor())
 
     @property
     def elapsed_time(self):
@@ -114,7 +122,8 @@ class Progress(object):
         return timedelta(seconds=max(0, self._finish - self._index))
 
     def finalize(self):
-        pass
+        sys.stdout.write(AnsiEscapes.show_cursor())
+        sys.stdout.flush()
 
     def next(self, i=1):
         now = datetime.now()
@@ -128,8 +137,10 @@ class Progress(object):
             for i in it:
                 yield i
                 self.next(PB_TIME_STEP)
-        finally:
+                raise Exception
+        except Exception:
             self.finalize()
+            raise
 
     def attach(self, observer):
         self.observers.append(observer)

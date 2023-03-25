@@ -16,14 +16,13 @@ setup(
     url='http://github.com/karakays/otp-py/',
     packages=find_packages(),
     install_requires=['pyqrcode>=1.2.1', 'pyperclip'],
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     license='MIT',
     keywords=['otp', 'otp-codes', 'otp-generator', 'authenticator'],
     description='Generate one time passwords',
     long_description=open('README.rst').read(),
     scripts=['bin/otp'],
-    classifiers=[ "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+    classifiers=[ "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "License :: OSI Approved :: MIT License"]
 )

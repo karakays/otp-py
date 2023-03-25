@@ -16,6 +16,8 @@
 
 # [bug]
 - hide cursor when counting
+- counter holds at 0 second and starts at wrong value
+- if there are no codes registered, then...
 
 # [desktop-apps]
 * Electron?
